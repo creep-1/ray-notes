@@ -1,0 +1,46 @@
+---
+import { TAGS, type TagSlug } from '../consts';
+
+interface Props {
+  slug: TagSlug;
+}
+
+const { slug } = Astro.props;
+const tag = TAGS.find((t) => t.slug === slug);
+const base = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<a class="tag-pill" href={`${base}tags/${slug}/`}>
+  <span class="dot" style={`background: var(--tag-${slug});`} aria-hidden="true"></span>
+  {tag ? tag.name : slug}
+</a>
+
+<style>
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 1px var(--space-2);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--text-muted);
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .tag-pill:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .dot {
+    width: var(--space-2);
+    height: var(--space-2);
+    border-radius: 50%;
+  }
+</style>

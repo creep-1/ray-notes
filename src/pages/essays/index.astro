@@ -1,0 +1,129 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagPill from '../../components/TagPill.astro';
+import { TAGS } from '../../consts';
+
+const base = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
+const published = (await getCollection('essays', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const counts = Object.fromEntries(
+  TAGS.map((tag) => [tag.slug, published.filter((p) => p.data.tags.includes(tag.slug)).length])
+);
+const years = [...new Set(published.map((entry) => entry.data.date.getFullYear()))];
+---
+
+<BaseLayout title="全部随笔">
+  <div class="container page">
+    <h1>全部随笔</h1>
+    <p class="count">共 {published.length} 篇（当前为示例内容）·按时间倒序</p>
+
+    <nav class="tag-entries" aria-label="观察角度">
+      {TAGS.map((tag) => (
+        <a href={`${base}tags/${tag.slug}/`}>{tag.name}（{counts[tag.slug]}）</a>
+      ))}
+    </nav>
+
+    {published.length === 0 && <p class="empty">还没有随笔。</p>}
+
+    {years.map((year) => (
+      <section class="year-group">
+        <h2>{year}</h2>
+        <ul class="rows">
+          {published
+            .filter((entry) => entry.data.date.getFullYear() === year)
+            .map((entry) => {
+              const dateText = entry.data.date.toISOString().slice(0, 10);
+              const primaryTag = entry.data.tags[0];
+              return (
+                <li>
+                  <time datetime={dateText}>{dateText}</time>
+                  <a class="row-title" href={`${base}essays/${entry.id}/`}>{entry.data.title}</a>
+                  {primaryTag && <TagPill slug={primaryTag} />}
+                </li>
+              );
+            })}
+        </ul>
+      </section>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--space-12) var(--space-16);
+  }
+
+  .count {
+    margin-top: var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .tag-entries {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin-top: var(--space-6);
+    padding-block: var(--space-3);
+    border-block: 1px solid var(--border);
+    font-size: var(--text-sm);
+  }
+
+  .tag-entries a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .tag-entries a:hover {
+    color: var(--accent);
+  }
+
+  .empty {
+    margin-top: var(--space-6);
+    color: var(--text-muted);
+  }
+
+  .year-group {
+    margin-top: var(--space-8);
+  }
+
+  .year-group h2 {
+    font-size: var(--text-lg);
+  }
+
+  .rows {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-2);
+  }
+
+  .rows li {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    padding-block: var(--space-2);
+  }
+
+  .rows time {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .row-title {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .row-title:hover {
+    color: var(--accent);
+  }
+</style>

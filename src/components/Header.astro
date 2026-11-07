@@ -1,0 +1,62 @@
+---
+import { SITE } from '../consts';
+
+const base = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<header class="site-header">
+  <div class="container inner">
+    <a class="site-title" href={base}>{SITE.TITLE}</a>
+    <nav class="nav">
+      <a href={`${base}essays/`}>全部随笔</a>
+      <a href={`${base}about/`}>关于</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .inner {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    padding-block: var(--space-4);
+  }
+
+  .site-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-md);
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .site-title:hover {
+    color: var(--accent);
+  }
+
+  .nav {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .nav a {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .nav a:hover {
+    color: var(--accent);
+  }
+</style>

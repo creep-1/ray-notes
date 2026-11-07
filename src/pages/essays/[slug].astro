@@ -1,0 +1,157 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PlaceholderBadge from '../../components/PlaceholderBadge.astro';
+import SpoilerNotice from '../../components/SpoilerNotice.astro';
+import TagPill from '../../components/TagPill.astro';
+
+export async function getStaticPaths() {
+  const published = (await getCollection('essays', ({ data }) => !data.draft)).sort(
+    (a, b) => a.data.date.valueOf() - b.data.date.valueOf()
+  );
+  return published.map((entry, index) => ({
+    params: { slug: entry.id },
+    props: { entry, sliceNo: index + 1 },
+  }));
+}
+
+const { entry, sliceNo } = Astro.props;
+const { title, date, tags, summary, spoiler, placeholder } = entry.data;
+const { Content } = await render(entry);
+
+const base = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const dateText = date.toISOString().slice(0, 10);
+const sliceNoText = `No.${String(sliceNo).padStart(3, '0')}`;
+---
+
+<BaseLayout title={title} description={summary}>
+  <article class="container article">
+    <header class="head">
+      {placeholder && <PlaceholderBadge />}
+      <h1>{title}</h1>
+      <p class="meta">
+        <time datetime={dateText}>{dateText}</time>
+        {tags.map((slug) => <TagPill slug={slug} />)}
+      </p>
+    </header>
+
+    <div class="prose">
+      {spoiler ? (
+        <SpoilerNotice>
+          <Content />
+        </SpoilerNotice>
+      ) : (
+        <Content />
+      )}
+    </div>
+
+    <footer class="foot">
+      <p class="slice-no">今日切片 {sliceNoText}</p>
+      <a class="back" href={`${base}essays/`}>← 全部随笔</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .article {
+    padding-block: var(--space-12) var(--space-16);
+  }
+
+  .head h1 {
+    margin-top: var(--space-3);
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    max-width: none;
+  }
+
+  .prose {
+    margin-top: var(--space-8);
+  }
+
+  .prose :global(p) {
+    margin-block: var(--space-4);
+  }
+
+  .prose :global(h2) {
+    font-size: var(--text-xl);
+    margin-block: var(--space-8) var(--space-3);
+  }
+
+  .prose :global(h3) {
+    font-size: var(--text-lg);
+    margin-block: var(--space-6) var(--space-2);
+  }
+
+  .prose :global(blockquote) {
+    border-left: 2px solid var(--border);
+    padding-left: var(--space-3);
+    color: var(--text-muted);
+    margin-block: var(--space-4);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: var(--space-6);
+    margin-block: var(--space-4);
+  }
+
+  .prose :global(img) {
+    display: block;
+    border-radius: 4px;
+    margin-block: var(--space-6);
+  }
+
+  .prose :global(code) {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-size: var(--text-sm);
+  }
+
+  .prose :global(pre) {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: var(--space-3);
+    overflow-x: auto;
+  }
+
+  .prose :global(pre code) {
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+
+  .prose :global(hr) {
+    margin-block: var(--space-8);
+  }
+
+  .foot {
+    margin-top: var(--space-12);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border);
+  }
+
+  .slice-no {
+    font-family: var(--font-serif);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .back {
+    display: inline-block;
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+</style>

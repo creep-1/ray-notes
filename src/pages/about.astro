@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PrivacyNotice from '../components/PrivacyNotice.astro';
+import { SITE, TAGS } from '../consts';
+---
+
+<BaseLayout title="关于">
+  <div class="container page">
+    <h1>关于</h1>
+
+    <h2>为什么写</h2>
+    <p>
+      这里是 {SITE.TITLE}，Ray 的日常观察随笔。它不是作品集，也不是简历站——主线只有一条：
+      Ray 如何看世界：用照片、游戏、书和孩子，记录日常里的感受与观察。
+    </p>
+
+    <h2>四个观察角度</h2>
+    <ul>
+      {TAGS.map((tag) => (
+        <li><strong>{tag.name}</strong>：{tag.description}</li>
+      ))}
+    </ul>
+
+    <h2>更新频率</h2>
+    <p>不定期更新（占位说明：目标每周一篇，以实际发布为准）。</p>
+
+    <h2>联系</h2>
+    <p>邮箱（占位，上线前替换）：hello@example.com</p>
+
+    <h2>隐私声明</h2>
+    <PrivacyNotice />
+    <p>
+      此外，标注【示例 / 占位】的文章是站点搭建期的演示内容，并非真实经历；真实随笔上线后，示例文章将被替换或移除。
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--space-12) var(--space-16);
+  }
+
+  h2 {
+    margin-top: var(--space-8);
+  }
+
+  p,
+  ul {
+    margin-top: var(--space-3);
+  }
+
+  ul {
+    padding-left: var(--space-6);
+  }
+
+  ul li + li {
+    margin-top: var(--space-2);
+  }
+</style>

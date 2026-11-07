@@ -1,0 +1,65 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EssayCard from '../../components/EssayCard.astro';
+import PrivacyNotice from '../../components/PrivacyNotice.astro';
+import { TAGS } from '../../consts';
+
+export async function getStaticPaths() {
+  return TAGS.map((tag) => ({
+    params: { tag: tag.slug },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+const base = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
+const entries = (
+  await getCollection('essays', ({ data }) => !data.draft && data.tags.includes(tag.slug))
+).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title={tag.name} description={tag.description}>
+  <div class="container page">
+    <h1>{tag.name}</h1>
+    <p class="desc">{tag.description}（{entries.length} 篇）</p>
+
+    {tag.slug === 'kids' && <PrivacyNotice />}
+
+    <div class="items">
+      {entries.map((entry) => <EssayCard entry={entry} />)}
+      {entries.length === 0 && <p class="empty">这个角度还没有随笔。</p>}
+    </div>
+
+    <a class="back" href={`${base}essays/`}>← 全部随笔</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--space-12) var(--space-16);
+  }
+
+  .desc {
+    margin-top: var(--space-3);
+    color: var(--text-muted);
+    font-size: var(--text-md);
+  }
+
+  .items {
+    margin-top: var(--space-4);
+  }
+
+  .empty {
+    color: var(--text-muted);
+  }
+
+  .back {
+    display: inline-block;
+    margin-top: var(--space-8);
+    font-size: var(--text-sm);
+  }
+</style>
