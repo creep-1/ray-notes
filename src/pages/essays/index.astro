@@ -20,7 +20,7 @@ const years = [...new Set(published.map((entry) => entry.data.date.getFullYear()
 <BaseLayout title="全部随笔">
   <div class="container page">
     <h1>全部随笔</h1>
-    <p class="count">共 {published.length} 篇（当前为示例内容）·按时间倒序</p>
+    <p class="count">共 {published.length} 篇 · 按时间倒序</p>
 
     <nav class="tag-entries" aria-label="观察角度">
       {TAGS.map((tag) => (

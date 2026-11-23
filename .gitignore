@@ -19,3 +19,12 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# agent memory (local only)
+.deep-memory/
+
+# 本地生成用的提示词，不发布
+prompt.md
+
+# 本地 agent 配置
+.opencode/
